@@ -13,7 +13,7 @@ public class scanLocators {
     final String SCAN_SHOPPING_CART_URL = "https://www.scanmalta.com/newstore/checkout/cart/";
     final String SCAN_PRODUCT_DETAILS_URL = "https://www.scanmalta.com/newstore/microsoft-surface-pro-7-123-win10-pro-core-i3-128gb-ssd-4gb-platinum-tablet.html";
     final String SCAN_SEARCH_PRODUCT_URL = "https://www.scanmalta.com/newstore/catalogsearch/result/?q=apple";
-
+    final String SCAN_CHECKOUT_URL = "https://www.scanmalta.com/newstore/checkout/onepage/";
     // IDS
     // LOGIN
     final String LOGIN_EMAIL_ID = "email";
