@@ -1,15 +1,14 @@
+import org.openqa.selenium.WebDriver;
 import pageObjects.scanPageObjects;
 
 public class scanWebSystem {
 
     private scanPageObjects pageObjects;
 
-    private final String EMAIL_VALID = "uomscanwebtesting@yopmail.com";
-    private final String PASSWORD_VALID = "thisPassword1234";
     private final String PRODUCT_2_SEARCH = "apple";
 
-    public scanWebSystem(){
-        pageObjects = new scanPageObjects();
+    public scanWebSystem(WebDriver webXDriver){
+        pageObjects = new scanPageObjects(webXDriver);
     }
 
     private boolean loggingIn = false,
@@ -46,7 +45,9 @@ public class scanWebSystem {
         removingItemFromCart = false;
         checkingOut = false;
 
-        pageObjects.userLogsIn(EMAIL_VALID,PASSWORD_VALID);
+        String EMAIL_VALID = "uomscanwebtesting@yopmail.com";
+        String PASSWORD_VALID = "thisPassword1234";
+        pageObjects.userLogsIn(EMAIL_VALID, PASSWORD_VALID);
     }
 
     public void logsOut(){
@@ -98,5 +99,9 @@ public class scanWebSystem {
         checkingOut = true;
 
         pageObjects.userChecksOut();
+    }
+
+    public void quit(){
+        pageObjects.quit();
     }
 }
