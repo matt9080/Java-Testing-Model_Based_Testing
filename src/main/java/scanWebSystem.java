@@ -71,13 +71,16 @@ public class scanWebSystem {
     }
 
     public void addingProduct(){
+        if(loggingIn || loggingOut){
+            pageObjects.navigateToHome();
+        }
         loggingIn = false;
         loggingOut = false;
         addingItemToCart = true;
         removingItemFromCart = false;
         checkingOut = false;
 
-        pageObjects.userSearchesForProduct(PRODUCT_2_SEARCH);
+        //pageObjects.userSearchesForProduct(PRODUCT_2_SEARCH);
         pageObjects.userAddsItem();
     }
 
@@ -99,6 +102,10 @@ public class scanWebSystem {
         checkingOut = true;
 
         pageObjects.userChecksOut();
+    }
+
+    public int checkCartItems(){
+        return pageObjects.checkCartItems();
     }
 
     public void quit(){

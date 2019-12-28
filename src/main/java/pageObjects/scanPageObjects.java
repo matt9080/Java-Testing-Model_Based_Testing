@@ -22,6 +22,10 @@ public class scanPageObjects {
         this.webXDriver = webXDriver;
     }
 
+    public void navigateToHome(){
+        webXDriver.navigate().to(scanLocators.SCAN_HOME_URL);
+    }
+
     public void userLogsIn(String email, String password) {
         webXDriver.navigate().to(scanLocators.SCAN_LOGIN_URL);
         try{    // Try catch is used here as it was noted that when the webDriver access the login page, the driver is blocked by a modal.
@@ -57,9 +61,11 @@ public class scanPageObjects {
     }
 
     public void userAddsItem(){
+        webXDriver.navigate().to(scanLocators.SCAN_SEARCH_PRODUCT_URL);
+
         random = new Random();
         List<WebElement> webElementsAtag = getListOfAddToCartBtn();
-        WebElement currencyTag = webElementsAtag.get(random.nextInt(25 - 1 + 1) + 1);
+        WebElement currencyTag = webElementsAtag.get(random.nextInt(webElementsAtag.size() - 1));
         actions.moveToElement(currencyTag);
         actions.perform();
         ((JavascriptExecutor) webXDriver)
@@ -82,6 +88,16 @@ public class scanPageObjects {
 
     public List<WebElement> getListOfRemoveFromCartButtons(){
         return webXDriver.findElements(By.className(scanLocators.REMOVE_FROM_CART_BUTTON_CLASS));
+    }
+
+    public int checkCartItems(){
+        webXDriver.navigate().to(scanLocators.SCAN_SHOPPING_CART_URL);
+        if(!webXDriver.getPageSource().contains("You have no items in your shopping cart.")) {
+            WebElement tableElement = webXDriver.findElement(By.id("shopping-cart-table"));
+            return tableElement.findElement(By.tagName("tbody")).findElements(By.tagName("tr")).size();
+        }else{
+            return 0;
+        }
     }
 
     public void userChecksOut(){

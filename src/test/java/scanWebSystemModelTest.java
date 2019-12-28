@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import pageObjects.scanPageObjects;
 
 import java.io.FileNotFoundException;
@@ -26,14 +27,18 @@ public class scanWebSystemModelTest implements FsmModel {
             ,addingItemToCart
             ,removingItemFromCart
             ,checkingOut;
+    private boolean canCheckOut,loggedIn;
 
     public Object getState() {
         return modelState;
     }
 
     public scanWebSystemModelTest(){
-        System.setProperty("webdriver.chrome.driver","chromedriverMac");   // Tells the system where to find the chrome driver.
-        webXDriver = new ChromeDriver();
+//        System.setProperty("webdriver.chrome.driver","chromedriverMac");   // Tells the system where to find the chrome driver.
+        System.setProperty("webdriver.chrome.driver","chromedriver.exe");   // Tells the system where to find the chrome driver.
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("headless");
+        webXDriver = new ChromeDriver(options);
         sut = new scanWebSystem(webXDriver);
     }
 
@@ -43,6 +48,8 @@ public class scanWebSystemModelTest implements FsmModel {
         addingItemToCart = false;
         removingItemFromCart = false;
         checkingOut = false;
+        canCheckOut = false;
+        loggedIn = false;
 
         modelState = scan_States.LOGGING_OUT;
 
@@ -55,7 +62,7 @@ public class scanWebSystemModelTest implements FsmModel {
 
     public boolean loggingInGuard(){
 
-        return (getState().equals(scan_States.LOGGING_OUT)
+        return (!loggedIn) && (getState().equals(scan_States.LOGGING_OUT)
             || getState().equals(scan_States.ADDING_ITEM_TO_CART)
             || getState().equals(scan_States.CHECKING_OUT)
             || getState().equals(scan_States.REMOVING_ITEM_FROM_CART));
@@ -65,6 +72,7 @@ public class scanWebSystemModelTest implements FsmModel {
         sut.logsIn();
 
         loggingIn = true;
+        loggedIn = true;
         loggingOut = false;
         addingItemToCart = false;
         removingItemFromCart = false;
@@ -76,7 +84,7 @@ public class scanWebSystemModelTest implements FsmModel {
 
     public boolean loggingOutGuard(){
 
-        return (getState().equals(scan_States.LOGGING_IN)
+        return (loggedIn) && (getState().equals(scan_States.LOGGING_IN)
             || getState().equals(scan_States.ADDING_ITEM_TO_CART)
             || getState().equals(scan_States.CHECKING_OUT)
             || getState().equals(scan_States.REMOVING_ITEM_FROM_CART));
@@ -86,6 +94,7 @@ public class scanWebSystemModelTest implements FsmModel {
         sut.logsOut();
 
         loggingIn = false;
+        loggedIn = false;
         loggingOut = true;
         addingItemToCart = false;
         removingItemFromCart = false;
@@ -95,7 +104,76 @@ public class scanWebSystemModelTest implements FsmModel {
         assertEquals("LoggingOut", true, sut.isLoggingOut());
     }
 
+    public boolean addProductGuard(){
+        return (getState().equals(scan_States.LOGGING_IN)
+                || getState().equals(scan_States.LOGGING_OUT)
+                || getState().equals(scan_States.CHECKING_OUT)
+                || getState().equals(scan_States.REMOVING_ITEM_FROM_CART));
+    }
 
+    public @Action void addProduct(){
+        sut.addingProduct();
+
+        loggingIn = false;
+        loggingOut = false;
+        addingItemToCart = true;
+        removingItemFromCart = false;
+        checkingOut = false;
+
+        canCheckOut = true;
+
+        modelState = scan_States.ADDING_ITEM_TO_CART;
+
+        assertEquals("Adding Product", true, sut.isAddingItemToCart());
+    }
+
+    public boolean removeProductGuard(){
+        return (getState().equals(scan_States.LOGGING_IN)
+                || getState().equals(scan_States.LOGGING_OUT)
+                || getState().equals(scan_States.CHECKING_OUT)
+                || getState().equals(scan_States.REMOVING_ITEM_FROM_CART)
+                || getState().equals(scan_States.ADDING_ITEM_TO_CART));
+    }
+
+    public @Action void removeProduct(){
+        if(sut.checkCartItems() > 0){
+            sut.removingProduct();
+
+            loggingIn = false;
+            loggingOut = false;
+            addingItemToCart = false;
+            removingItemFromCart = true;
+            checkingOut = false;
+            modelState = scan_States.REMOVING_ITEM_FROM_CART;
+            canCheckOut = sut.checkCartItems() > 0;
+
+            assertEquals("Removing Product", true, sut.isRemovingItemFromCart());
+        }else {
+            canCheckOut = false;
+        }
+
+    }
+
+    public boolean checkoutGuard(){
+        return ((getState().equals(scan_States.LOGGING_IN)
+                || getState().equals(scan_States.LOGGING_OUT)
+                || getState().equals(scan_States.REMOVING_ITEM_FROM_CART)
+                || getState().equals(scan_States.ADDING_ITEM_TO_CART))
+                && canCheckOut);
+    }
+
+    public @Action void checkout(){
+        sut.checkingOut();
+
+        loggingIn = false;
+        loggingOut = false;
+        addingItemToCart = false;
+        removingItemFromCart = false;
+        checkingOut = true;
+        modelState = scan_States.CHECKING_OUT;
+
+        assertEquals("Removing Product", true, sut.isCheckingOut());
+    }
     @After
     public void tearDown(){
         webXDriver.quit();
@@ -111,7 +189,7 @@ public class scanWebSystemModelTest implements FsmModel {
         tester.addCoverageMetric(new TransitionPairCoverage());
         tester.addCoverageMetric(new StateCoverage());
         tester.addCoverageMetric(new ActionCoverage());
-        tester.generate(5);
+        tester.generate(250);
         tester.printCoverage();
     }
 }
