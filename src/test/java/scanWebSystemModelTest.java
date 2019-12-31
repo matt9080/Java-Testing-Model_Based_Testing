@@ -37,7 +37,7 @@ public class scanWebSystemModelTest implements FsmModel {
 //        System.setProperty("webdriver.chrome.driver","chromedriverMac");   // Tells the system where to find the chrome driver.
         System.setProperty("webdriver.chrome.driver","chromedriver.exe");   // Tells the system where to find the chrome driver.
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("headless");
+        options.addArguments("--start-fullscreen");
         webXDriver = new ChromeDriver(options);
         sut = new scanWebSystem(webXDriver);
     }
@@ -64,7 +64,7 @@ public class scanWebSystemModelTest implements FsmModel {
 
         return (!loggedIn) && (getState().equals(scan_States.LOGGING_OUT)
             || getState().equals(scan_States.ADDING_ITEM_TO_CART)
-            || getState().equals(scan_States.CHECKING_OUT)
+//            || getState().equals(scan_States.CHECKING_OUT)
             || getState().equals(scan_States.REMOVING_ITEM_FROM_CART));
     }
 
@@ -86,7 +86,7 @@ public class scanWebSystemModelTest implements FsmModel {
 
         return (loggedIn) && (getState().equals(scan_States.LOGGING_IN)
             || getState().equals(scan_States.ADDING_ITEM_TO_CART)
-            || getState().equals(scan_States.CHECKING_OUT)
+//            || getState().equals(scan_States.CHECKING_OUT)
             || getState().equals(scan_States.REMOVING_ITEM_FROM_CART));
     }
 
@@ -107,7 +107,7 @@ public class scanWebSystemModelTest implements FsmModel {
     public boolean addProductGuard(){
         return (getState().equals(scan_States.LOGGING_IN)
                 || getState().equals(scan_States.LOGGING_OUT)
-                || getState().equals(scan_States.CHECKING_OUT)
+//                || getState().equals(scan_States.CHECKING_OUT)
                 || getState().equals(scan_States.REMOVING_ITEM_FROM_CART));
     }
 
@@ -130,7 +130,7 @@ public class scanWebSystemModelTest implements FsmModel {
     public boolean removeProductGuard(){
         return (getState().equals(scan_States.LOGGING_IN)
                 || getState().equals(scan_States.LOGGING_OUT)
-                || getState().equals(scan_States.CHECKING_OUT)
+//                || getState().equals(scan_States.CHECKING_OUT)
                 || getState().equals(scan_States.REMOVING_ITEM_FROM_CART)
                 || getState().equals(scan_States.ADDING_ITEM_TO_CART));
     }
@@ -178,6 +178,7 @@ public class scanWebSystemModelTest implements FsmModel {
     public void tearDown(){
         webXDriver.quit();
     }
+
 
     @Test
     public void webSystemModelRunner() {
